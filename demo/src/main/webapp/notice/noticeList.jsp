@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
-<%@ page import="java.util.*" %>
+<%@ page import="java.util.*,com.util.BSPageBar" %>
 <%
 //noticeList_jsp.java -> noticeList_jsp.class
 	//서블릿(FrontMVC)을 경유[NoticeController-> NoticeLogic]하고 
@@ -11,7 +11,14 @@ pageEncoding="UTF-8"%>
 	if(nList !=null){
 		size = nList.size();
 	}
-	out.print(size);
+
+	//페이지처리
+    int numPerPage = 4;
+    int nowPage = 0;
+    if(request.getParameter("nowPage")!=null){
+    nowPage = Integer.parseInt(request.getParameter("nowPage"));
+    }
+
 	//테스트 링크
 	//http://localhost:8000/notice/noticeList.gd - FrontMVC경유하는 경우
 	//http://localhost:8000/notice/noticeList.jsp - FrontMVC경유하지 않는다.
@@ -25,16 +32,27 @@ pageEncoding="UTF-8"%>
     <%@include file="/common/bootstrap_common.jsp" %>
 	<link rel="stylesheet" href="/css/notice.css">
     <script type="text/javascript">
-    	function searchEnter(){
-    		console.log('searchEnter')
-    	}
-		
+    	function searchEnter(event){
+    		console.log(window.event.keyCode)
+			if(window.event.keyCode == 13){
+				noticeSearch()
+			}
+			event.isComposing//검색후 잔여검색기록 없애는코드
+		}
 		function noticeSearch(){
 			console.log('noticeSearch');
 			const gubun = document.querySelector("#gubun").value;
 			const keyword = document.querySelector("#keyword").value;
 			console.log(`${gubun} , ${keyword}`);
-			location.href="/notice/noticeList.gd?gubun="+gubun+"&keyword="+keyword;
+			location.href="/notice/noticeList?gubun="+gubun+"&keyword="+keyword;
+		}
+		function noticeList(){
+			console.log('noticeList()')
+			location.href="/notice/noticeList"
+		}
+		function noticeInsert(){
+			console.log('noticeInsert()')
+			document.querySelector('#f_notice').submit()
 		}
     </script>
   </head>
@@ -84,7 +102,9 @@ pageEncoding="UTF-8"%>
 	//n건을 조회하는 경우이지만 resultType에는 map이나 vo패턴을 주는게 맞다
 	//주의사항 - 자동으로 키값을 생성함 - 디폴트가 대문자이다
 	//myBatis연동시 resultType=map{한행}으로 줌 -> selectList("noticeList", pMap)
-	for(int i=0;i<size;i++){
+
+		for(int i = nowPage*numPerPage; i < (nowPage*numPerPage)+numPerPage; i++) {
+			if (i == size) break;
 		Map<String,Object> rmap = nList.get(i);
 %>					
 					<tr>
@@ -100,7 +120,16 @@ pageEncoding="UTF-8"%>
     
 <!-- [[ 페이징 처리  구간  ]] -->
 			<div style="display:flex; justify-content:center;">
-				<ul class="pagination">[1] [2] [3]</ul>
+				<ul class="pagination">
+
+					<%
+					String pagePath = "noticeList";
+					BSPageBar bspb = new BSPageBar(numPerPage,size,nowPage,pagePath);
+					out.print(bspb.getPageBar());
+					%>
+
+				</ul>
+			
 			</div>
 <!-- [[ 페이징 처리  구간  ]] -->		
 	  
@@ -131,8 +160,8 @@ pageEncoding="UTF-8"%>
 	      </div>
 	      <!-- Modal body -->
 	      <div class="modal-body">
-	      	<form id="f_notice" method="get" action="./noticeInsert.pj1">
-	      	  <input type="hidden" name="method" value="memberInsert">
+	      	<form id="f_notice" method="post" action="./noticeInsert">
+	      	  <input type="hidden" name="method" value="noticeInsert">
 	          <div class="form-floating mb-3 mt-3">
 	            <input type="text"  class="form-control" id="n_title" name="n_title" placeholder="Enter 제목" />
 	            <label for="n_title">제목</label>

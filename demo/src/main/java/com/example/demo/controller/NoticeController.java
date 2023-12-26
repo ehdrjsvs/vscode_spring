@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,33 +41,70 @@ public class NoticeController {
 
     // 전체조회 및 조건검색일때
     // SELECT*FROM notice WHERE gubun=> AND keywoed=?
+    // spring에서는 더이상 서블릿이아니더라도 단독으로 서비스를 제공할수있도록 발전됨.
+    // 서블릿 - 상속은 결합도가 높다 메소드 오버라이드 - 강제사항
+    // 그런데 스프링은 결합도를 낮춘다 - 더이상HttpServletRequset,HttpServletResponse를 사용하지않는다
+    // req.setAttribute(),req.getParameter()
+    //사용자로부터 입력받는값을 읽어오기 - @RequestParam 지원됨
+    //Post방식에서 body로 받아올때 @RequestBody사용된다
     @GetMapping("noticeList")
-    public String noticeList(@RequestParam Map<String, Object> pmap, HttpServletRequest req) {
+    public String noticeList(Model model, @RequestParam Map<String, Object> pmap) {
+        logger.info("noticeList");
         // logger.info(pmap.get("gubun").toString());
         // logger.info(req.getParameter("gubun"));
         // logger.info(pmap.get("keyword").toString());
-        List<Map<String, Object>> list = null;
-        list = noticeLogic.noticeList(pmap);
+        List<Map<String, Object>> nList = null;// [ {},{},{} ]
+        nList = noticeLogic.noticeList(pmap);
+        model.addAttribute("nList", nList);
         return "forward:noticeList.jsp"; // webapp아래에서찾음
     }
 
+    // 포스트 방식은 단위테스트가 안된다 get방식으로 진행
     // insert into notice(n_no,n_title,n_content,n_writer) values(?,?,?,?)
     @PostMapping("noticeInsert")
     public String noticeInsert(@RequestParam Map<String, Object> pmap) {
-        logger.info(pmap.get("n_title").toString());
-        logger.info(pmap.get("n_content").toString());
-        return "redirect:noticeList"; // 화면을 호출하는게아니라 url을호출한다-9번라인
+        logger.info("noticeInsert");
+        // logger.info(pmap.get("n_title").toString());
+        // logger.info(pmap.get("n_content").toString());
+        int result = 0;
+        String path = "";
+        result = noticeLogic.noticeInsert(pmap);
+        if (result == 1) {// 입력이 성공했을때
+            path = "redirect:noticeList";
+        } else {// 입력이 실패했을때
+            path = "redirect:noticeError.jsp";
+        }
+        return path; // 화면을 호출하는게아니라 url을호출한다-9번라인
     }
 
+    // update notice set n_title=? , n_content=? ,n_writer=> where n_no=?
     @GetMapping("noticeUpdate")
-    public String noticeUpdate() {
+    public String noticeUpdate(@RequestParam Map<String, Object> pmap) {
         logger.info("noticeUpdate");
-        return "redirect:noticeList.jsp"; // 화면을 호출하는게아니라 url을호출한다-9번라인
+        int result = 0;
+        String path = "";
+        result = noticeLogic.noticeUpdate(pmap);
+        if (result == 1) {
+            path = "redirect:noticeList";
+        } else {
+            path = "redirect:noticeError.jsp";
+        }
+        return path; // 화면을 호출하는게아니라 url을호출한다-9번라인
     }
 
-    @GetMapping("noticeDelete")
-    public String noticeDelete() {
+    // delete from notice where n_no=?
+    @DeleteMapping("noticeDelete")
+    // public String noticeDelete(@RequestParam int n_no) {
+    public String noticeDelete(@RequestParam Map<String, Object> pmap) {
         logger.info("noticeDelete");
-        return "redirect:noticeList.jsp"; // 화면을 호출하는게아니라 url을호출한다-9번라인
+        int result = 0;
+        String path = "";
+        result = noticeLogic.noticeDelete(pmap);
+        if (result == 1) {
+            path = "redirect:noticeList";
+        } else {
+            path = "redirect:noticeError.jsp";
+        }
+        return path; // 화면을 호출하는게아니라 url을호출한다-9번라인
     }
 }

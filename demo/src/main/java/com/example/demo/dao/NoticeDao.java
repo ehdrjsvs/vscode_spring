@@ -1,6 +1,5 @@
 package com.example.demo.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +7,6 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 // xxxDao클래스는 MVC패턴에 영향을주는 클래스는 아니다 - 디자인패턴
@@ -23,8 +21,41 @@ public class NoticeDao {
 
     public List<Map<String, Object>> noticeList(Map<String, Object> pmap) {// gubun=n_title,keyword=휴관
         logger.info("noticeList");
+        // JAVA에서 ->myBatis -> Oracle
         List<Map<String, Object>> list = sqlSessionTemplate.selectList("noticeList", pmap);
         logger.info(list.toString());
         return list;
     }
+
+    public int noticeInsert(Map<String, Object> pMap) {
+        logger.info("noticeInsert");
+        int result = 0;
+        result = sqlSessionTemplate.insert("noticeInsert", pMap);
+        return result;
+    }
+
+    public int noticeUpdate(Map<String, Object> pMap) {
+        logger.info("noticeUpdate");
+        int result = 0;
+        try {
+            result = sqlSessionTemplate.update("noticeUpdate", pMap);
+
+        } catch (Exception e) {
+            logger.info(e.toString());
+        }
+        return result;
+    }//////////// end of noticeUpdate
+
+    public int noticeDelete(Map<String, Object> pMap) {
+        logger.info("noticeDelete");
+        int result = 0;
+        try {
+            result = sqlSessionTemplate.delete("noticeDelete", pMap);
+
+        } catch (Exception e) {
+            logger.info(e.toString());
+        }
+        return result;
+    }///////////// end of noticeDelete
+
 }
