@@ -19,7 +19,7 @@ public class MyContextMain {
         TestController testController = (TestController) mc.getBean("testController");
         System.out.println("testController = " + testController);
 
-        testController.setTestLogic(testLogic);
+        testController.setTestLogic(testLogic);   
         testLogic.setTestDao(testDao);
         testController.testList();
         // 같은주소번지 출력 = 싱글톤패턴 디폴트

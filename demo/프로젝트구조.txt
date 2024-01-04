@@ -1,0 +1,14 @@
+프로젝트명 demo
+프로젝트배포이름 demo.war
+
+자바소스 com.example.demo.* 공통분모 - 이 패키지가 프로젝트생생성시 결정된 도메인 
+com.example.demo.controller.xxxController
+com.example.demo.logic.xxxLogic
+com.example.demo.dao.xxxDao
+스프링 프로젝트생성시에 결정한패키지이름이아니면 추가설정필요함
+
+resources
+mapper - xxx.xml - 쿼리문 작성된파일 배치
+ sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:/mapper/**/*.xml"));
+        return sqlSessionFactoryBean.getObject();
+    }

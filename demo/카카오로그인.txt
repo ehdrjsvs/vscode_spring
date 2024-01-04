@@ -1,0 +1,35 @@
+카카오 로그인 실습 - OAuth2.0 - 토큰을 활용한 인증방법
+
+작업지시서
+
+1.웹서버 주소 : http://localhost: 8000
+
+2.클라이언트키 : 896f11cd1644ef2adbd2eff3c8f7fe3a //rest api key
+
+3.카카오 로그인 요청 콜백 주소
+http://localhost:8000/auth/kakao/callback   //Redirect URI
+
+4.카카오 로그아웃 콜백주소
+	
+http://localhost:8000/auth/kakao/logout   //Logout Redirect URI
+
+5.동의구성
+id:숫자
+username,password
+
+6.로그인 요청 URL
+https://kauth.kakao.com/oauth/authorize?client_id=896f11cd1644ef2adbd2eff3c8f7fe3a&redirect_uri=http://localhost:8000/auth/kakao/callback&response_type=code
+
+7
+"grant_type","authorization_code"
+"client_id" , "896f11cd1644ef2adbd2eff3c8f7fe3a"
+"redirect_uri", http://localhost:8000/auth/kakao/callback 
+"code",code
+
+8.사용자 정보 가져오기
+GET/POST ->	https://kapi.kakao.com/v2/user/me
+Authorization	Authorization: Bearer ${ACCESS_TOKEN}
+인증 방식, 액세스 토큰으로 인증 요청
+Content-type	Content-type: application/x-www-form-urlencoded;charset=utf-8
+요청 데이터 타입
+
